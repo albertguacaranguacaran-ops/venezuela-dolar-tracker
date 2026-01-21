@@ -7,6 +7,7 @@ export interface RatesResponse {
         usd: number;
         eur: number;
         date: string;
+        source: string;
     };
     binance: {
         buy: number;

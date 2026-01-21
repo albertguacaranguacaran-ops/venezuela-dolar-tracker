@@ -1,5 +1,6 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import axios from 'axios';
+import * as cheerio from 'cheerio';
 
 interface BinanceP2PResponse {
     data: Array<{
@@ -19,6 +20,7 @@ export interface RatesResponse {
         usd: number;
         eur: number;
         date: string;
+        source: string;
     };
     binance: {
         buy: number;
@@ -42,36 +44,127 @@ export interface RatesResponse {
 @Injectable()
 export class RatesService {
 
-    async getBcvRate(): Promise<{ usd: number; eur: number; date: string }> {
+    async getBcvRate(): Promise<{ usd: number; eur: number; date: string; source: string }> {
         try {
-            // Fetch BCV official USD rate and EUR/USD rate in parallel
-            const [bcvResponse, eurResponse] = await Promise.all([
-                axios.get('https://ve.dolarapi.com/v1/dolares/oficial', { timeout: 10000 }),
-                axios.get('https://api.exchangerate-api.com/v4/latest/EUR', { timeout: 10000 }),
-            ]);
-
-            const bcvData = bcvResponse.data;
-            const eurData = eurResponse.data;
-
-            const usdRate = bcvData.promedio || 0;
-            // Calculate EUR/VES using: EUR/VES = USD/VES × EUR/USD
-            const eurUsdRate = eurData.rates?.USD || 1.17;
-            const eurRate = usdRate * eurUsdRate;
-
-            const dateStr = bcvData.fechaActualizacion
-                ? new Date(bcvData.fechaActualizacion).toISOString().split('T')[0]
-                : new Date().toISOString().split('T')[0];
-
-            return {
-                usd: usdRate,
-                eur: Math.round(eurRate * 100) / 100,
-                date: dateStr,
-            };
+            // Try direct scraping from BCV website first
+            const bcvData = await this.scrapeBcvWebsite();
+            if (bcvData.usd > 0) {
+                return bcvData;
+            }
+            // Fallback to API if scraping fails
+            return await this.getBcvFromApi();
         } catch (error) {
             console.error('Error fetching BCV rate:', error.message);
-            // Fallback values
-            return { usd: 0, eur: 0, date: new Date().toISOString().split('T')[0] };
+            // Try API as fallback
+            try {
+                return await this.getBcvFromApi();
+            } catch {
+                return { usd: 0, eur: 0, date: new Date().toISOString().split('T')[0], source: 'error' };
+            }
         }
+    }
+
+    private async scrapeBcvWebsite(): Promise<{ usd: number; eur: number; date: string; source: string }> {
+        const response = await axios.get('https://www.bcv.org.ve/', {
+            timeout: 15000,
+            headers: {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+                'Accept-Language': 'es-ES,es;q=0.9,en;q=0.8',
+            },
+        });
+
+        const $ = cheerio.load(response.data);
+
+        let usdRate = 0;
+        let eurRate = 0;
+
+        // Find USD rate - look for the div with USD indicator
+        $('div.col-sm-12').each((_, element) => {
+            const text = $(element).text();
+
+            // Look for USD value
+            if (text.includes('USD') && !usdRate) {
+                const strongValue = $(element).find('strong').text().trim();
+                if (strongValue) {
+                    // Parse the rate value (format: 347,26310000)
+                    const cleanValue = strongValue.replace(/\./g, '').replace(',', '.');
+                    const parsed = parseFloat(cleanValue);
+                    if (!isNaN(parsed) && parsed > 100) {
+                        usdRate = Math.round(parsed * 100) / 100;
+                    }
+                }
+            }
+
+            // Look for EUR value
+            if (text.includes('EUR') && !eurRate) {
+                const strongValue = $(element).find('strong').text().trim();
+                if (strongValue) {
+                    const cleanValue = strongValue.replace(/\./g, '').replace(',', '.');
+                    const parsed = parseFloat(cleanValue);
+                    if (!isNaN(parsed) && parsed > 100) {
+                        eurRate = Math.round(parsed * 100) / 100;
+                    }
+                }
+            }
+        });
+
+        // Alternative: Try finding in the recuadro divs
+        if (!usdRate) {
+            $('div#702, div.recuadro, div.views-field-field-tasa-venta').each((_, element) => {
+                const text = $(element).text();
+                if (text.includes('USD')) {
+                    const match = text.match(/(\d{2,3})[,.](\d{2,8})/);
+                    if (match) {
+                        const value = parseFloat(`${match[1]}.${match[2]}`);
+                        if (value > 100) {
+                            usdRate = Math.round(value * 100) / 100;
+                        }
+                    }
+                }
+            });
+        }
+
+        // Try to extract date
+        let dateStr = new Date().toISOString().split('T')[0];
+        const dateMatch = response.data.match(/Fecha Valor[:\s]*([^<]+)/i);
+        if (dateMatch) {
+            dateStr = new Date().toISOString().split('T')[0];
+        }
+
+        console.log(`BCV Scraping result: USD=${usdRate}, EUR=${eurRate}`);
+
+        return {
+            usd: usdRate,
+            eur: eurRate,
+            date: dateStr,
+            source: 'bcv-scraping',
+        };
+    }
+
+    private async getBcvFromApi(): Promise<{ usd: number; eur: number; date: string; source: string }> {
+        const [bcvResponse, eurResponse] = await Promise.all([
+            axios.get('https://ve.dolarapi.com/v1/dolares/oficial', { timeout: 10000 }),
+            axios.get('https://api.exchangerate-api.com/v4/latest/EUR', { timeout: 10000 }),
+        ]);
+
+        const bcvData = bcvResponse.data;
+        const eurData = eurResponse.data;
+
+        const usdRate = bcvData.promedio || 0;
+        const eurUsdRate = eurData.rates?.USD || 1.17;
+        const eurRate = usdRate * eurUsdRate;
+
+        const dateStr = bcvData.fechaActualizacion
+            ? new Date(bcvData.fechaActualizacion).toISOString().split('T')[0]
+            : new Date().toISOString().split('T')[0];
+
+        return {
+            usd: usdRate,
+            eur: Math.round(eurRate * 100) / 100,
+            date: dateStr,
+            source: 've.dolarapi.com',
+        };
     }
 
     async getBinanceP2P(tradeType: 'BUY' | 'SELL'): Promise<number[]> {
