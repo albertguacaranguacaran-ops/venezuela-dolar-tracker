@@ -33,5 +33,33 @@
     "bcvEur": 403.08,
     "binanceBuy": 464,
     "binanceSell": 470
+  },
+  {
+    "timestamp": "2026-01-21T20:58:57.084Z",
+    "bcvUsd": 344.51,
+    "bcvEur": 403.08,
+    "binanceBuy": 463,
+    "binanceSell": 470
+  },
+  {
+    "timestamp": "2026-01-21T21:09:52.600Z",
+    "bcvUsd": 347.26,
+    "bcvEur": 0,
+    "binanceBuy": 464,
+    "binanceSell": 470
+  },
+  {
+    "timestamp": "2026-01-21T21:10:17.747Z",
+    "bcvUsd": 347.26,
+    "bcvEur": 0,
+    "binanceBuy": 464,
+    "binanceSell": 470
+  },
+  {
+    "timestamp": "2026-01-21T21:31:51.864Z",
+    "bcvUsd": 347.26,
+    "bcvEur": 407.17,
+    "binanceBuy": 464,
+    "binanceSell": 470
   }
 ]

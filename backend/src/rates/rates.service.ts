@@ -84,47 +84,61 @@ export class RatesService {
         let usdRate = 0;
         let eurRate = 0;
 
-        // The BCV site has a specific structure for exchange rates
-        // Look for the USD and EUR divs by their ID or class
+        // The BCV site structure: rates appear in order EUR, CNY, TRY, RUB, USD
+        // USD is the last one and appears with format: $  USD   347,26310000
 
-        // Method 1: Search for specific currency indicators with their values
-        const bodyText = $('body').text();
+        // Get all text and search for patterns
+        const html = response.data;
 
-        // Try to find USD rate - format: USD followed by number like 347,26310000
-        const usdMatch = bodyText.match(/USD[\s\S]{0,50}?(\d{2,3})[,.](\d{2,10})/i);
-        if (usdMatch) {
-            const value = parseFloat(`${usdMatch[1]}.${usdMatch[2].substring(0, 2)}`);
+        // Search for USD pattern: USD followed by whitespace and number
+        // Format in HTML: USD</span>...</strong>347,26310000</strong>
+        const usdRegex = /USD[\s\S]*?<strong[^>]*>(\d{2,3}),(\d{2,10})<\/strong>/i;
+        const usdHtmlMatch = html.match(usdRegex);
+        if (usdHtmlMatch) {
+            const value = parseFloat(`${usdHtmlMatch[1]}.${usdHtmlMatch[2].substring(0, 2)}`);
             if (value > 100 && value < 500) {
                 usdRate = Math.round(value * 100) / 100;
             }
         }
 
-        // Try to find EUR rate - format: EUR followed by number like 407,17293001
-        const eurMatch = bodyText.match(/EUR[\s\S]{0,50}?(\d{2,3})[,.](\d{2,10})/i);
-        if (eurMatch) {
-            const value = parseFloat(`${eurMatch[1]}.${eurMatch[2].substring(0, 2)}`);
+        // Search for EUR pattern
+        const eurRegex = /EUR[\s\S]*?<strong[^>]*>(\d{2,3}),(\d{2,10})<\/strong>/i;
+        const eurHtmlMatch = html.match(eurRegex);
+        if (eurHtmlMatch) {
+            const value = parseFloat(`${eurHtmlMatch[1]}.${eurHtmlMatch[2].substring(0, 2)}`);
             if (value > 100 && value < 600) {
                 eurRate = Math.round(value * 100) / 100;
             }
         }
 
-        // Method 2: Look for divs with id containing rate info
-        if (!usdRate) {
-            $('div[id*="702"], div.view-tipo-de-cambio-702, div.views-field').each((_, element) => {
-                const text = $(element).text();
-                if (text.includes('USD') && !usdRate) {
-                    const match = text.match(/(\d{2,3})[,.](\d{2,10})/);
-                    if (match) {
-                        const value = parseFloat(`${match[1]}.${match[2].substring(0, 2)}`);
-                        if (value > 100 && value < 500) {
-                            usdRate = Math.round(value * 100) / 100;
-                        }
+        // Fallback: Try extracting from text content if HTML parsing failed
+        if (!usdRate || !eurRate) {
+            const bodyText = $('body').text();
+
+            // Match USD: USD followed by spaces and number
+            if (!usdRate) {
+                const usdMatch = bodyText.match(/USD\s+(\d{2,3})[,.](\d{2,10})/i);
+                if (usdMatch) {
+                    const value = parseFloat(`${usdMatch[1]}.${usdMatch[2].substring(0, 2)}`);
+                    if (value > 100 && value < 500) {
+                        usdRate = Math.round(value * 100) / 100;
                     }
                 }
-            });
+            }
+
+            // Match EUR: EUR followed by spaces and number
+            if (!eurRate) {
+                const eurMatch = bodyText.match(/EUR\s+(\d{2,3})[,.](\d{2,10})/i);
+                if (eurMatch) {
+                    const value = parseFloat(`${eurMatch[1]}.${eurMatch[2].substring(0, 2)}`);
+                    if (value > 100 && value < 600) {
+                        eurRate = Math.round(value * 100) / 100;
+                    }
+                }
+            }
         }
 
-        console.log(`BCV Scraping - Raw matches: USD=${usdMatch?.[0]?.substring(0, 30)}, EUR=${eurMatch?.[0]?.substring(0, 30)}`);
+        console.log(`BCV Scraping - USD=${usdRate}, EUR=${eurRate}, HTML match: ${!!usdHtmlMatch}`);
 
         // Try to extract date
         let dateStr = new Date().toISOString().split('T')[0];
