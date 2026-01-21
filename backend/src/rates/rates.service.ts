@@ -38,16 +38,20 @@ export class RatesService {
 
     async getBcvRate(): Promise<{ usd: number; eur: number; date: string }> {
         try {
-            // Using dolarvzla.com API for BCV rates
-            const response = await axios.get('https://pydolarve.org/api/v2/dollar?page=bcv', {
+            // Using ve.dolarapi.com for BCV official rates
+            const response = await axios.get('https://ve.dolarapi.com/v1/dolares/oficial', {
                 timeout: 10000,
             });
 
             const data = response.data;
+            const dateStr = data.fechaActualizacion
+                ? new Date(data.fechaActualizacion).toISOString().split('T')[0]
+                : new Date().toISOString().split('T')[0];
+
             return {
-                usd: data.monitors?.usd?.price || 0,
-                eur: data.monitors?.eur?.price || 0,
-                date: data.datetime?.date || new Date().toISOString().split('T')[0],
+                usd: data.promedio || 0,
+                eur: 0, // This API doesn't provide EUR rate
+                date: dateStr,
             };
         } catch (error) {
             console.error('Error fetching BCV rate:', error.message);
