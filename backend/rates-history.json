@@ -1,0 +1,30 @@
+[
+  {
+    "timestamp": "2026-01-21T20:21:01.921Z",
+    "bcvUsd": 344.51,
+    "bcvEur": 403.08,
+    "binanceBuy": 464,
+    "binanceSell": 470
+  },
+  {
+    "timestamp": "2026-01-21T20:48:07.866Z",
+    "bcvUsd": 407.17,
+    "bcvEur": 407.17,
+    "binanceBuy": 464,
+    "binanceSell": 470
+  },
+  {
+    "timestamp": "2026-01-21T20:48:10.114Z",
+    "bcvUsd": 407.17,
+    "bcvEur": 407.17,
+    "binanceBuy": 464,
+    "binanceSell": 470
+  },
+  {
+    "timestamp": "2026-01-21T20:49:34.845Z",
+    "bcvUsd": 407.17,
+    "bcvEur": 407.17,
+    "binanceBuy": 464,
+    "binanceSell": 470
+  }
+]
