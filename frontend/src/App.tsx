@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { api, RatesResponse } from './services/api';
+import { api } from './services/api';
+import type { RatesResponse } from './services/api';
 import { RateCard } from './components/RateCard';
 import { Calculator } from './components/Calculator';
 import { StatsCard } from './components/StatsCard';
