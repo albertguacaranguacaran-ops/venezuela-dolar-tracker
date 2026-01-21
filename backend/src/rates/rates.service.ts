@@ -38,19 +38,27 @@ export class RatesService {
 
     async getBcvRate(): Promise<{ usd: number; eur: number; date: string }> {
         try {
-            // Using ve.dolarapi.com for BCV official rates
-            const response = await axios.get('https://ve.dolarapi.com/v1/dolares/oficial', {
-                timeout: 10000,
-            });
+            // Fetch BCV official USD rate and EUR/USD rate in parallel
+            const [bcvResponse, eurResponse] = await Promise.all([
+                axios.get('https://ve.dolarapi.com/v1/dolares/oficial', { timeout: 10000 }),
+                axios.get('https://api.exchangerate-api.com/v4/latest/EUR', { timeout: 10000 }),
+            ]);
 
-            const data = response.data;
-            const dateStr = data.fechaActualizacion
-                ? new Date(data.fechaActualizacion).toISOString().split('T')[0]
+            const bcvData = bcvResponse.data;
+            const eurData = eurResponse.data;
+
+            const usdRate = bcvData.promedio || 0;
+            // Calculate EUR/VES using: EUR/VES = USD/VES × EUR/USD
+            const eurUsdRate = eurData.rates?.USD || 1.17;
+            const eurRate = usdRate * eurUsdRate;
+
+            const dateStr = bcvData.fechaActualizacion
+                ? new Date(bcvData.fechaActualizacion).toISOString().split('T')[0]
                 : new Date().toISOString().split('T')[0];
 
             return {
-                usd: data.promedio || 0,
-                eur: 0, // This API doesn't provide EUR rate
+                usd: usdRate,
+                eur: Math.round(eurRate * 100) / 100,
                 date: dateStr,
             };
         } catch (error) {
