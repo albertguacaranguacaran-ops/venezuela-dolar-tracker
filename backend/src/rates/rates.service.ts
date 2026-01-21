@@ -26,8 +26,14 @@ export interface RatesResponse {
         avgBuy: number;
         avgSell: number;
     };
+    paralelo: {
+        rate: number; // (EUR + Binance Avg) / 2
+        formula: string;
+    };
     spread: {
         bcvVsBinanceBuy: number;
+        bcvVsBinanceSell: number;
+        bcvVsParalelo: number;
         binanceSellVsBuy: number;
     };
     timestamp: string;
@@ -114,6 +120,12 @@ export class RatesService {
 
         const binanceBuy = buyPrices[0] || 0;
         const binanceSell = sellPrices[0] || 0;
+        const binanceAvg = (avgBuy + avgSell) / 2;
+
+        // Tasa Paralelo / Compra Físico = (EUR + Promedio Binance) / 2
+        const paraleloRate = bcv.eur > 0 && binanceAvg > 0
+            ? Math.round(((bcv.eur + binanceAvg) / 2) * 100) / 100
+            : 0;
 
         return {
             bcv: bcv,
@@ -123,11 +135,18 @@ export class RatesService {
                 avgBuy: Math.round(avgBuy * 100) / 100,
                 avgSell: Math.round(avgSell * 100) / 100,
             },
+            paralelo: {
+                rate: paraleloRate,
+                formula: '(EUR + Promedio Binance) / 2',
+            },
             spread: {
                 bcvVsBinanceBuy: bcv.usd > 0 ? Math.round(((binanceBuy - bcv.usd) / bcv.usd) * 10000) / 100 : 0,
+                bcvVsBinanceSell: bcv.usd > 0 ? Math.round(((binanceSell - bcv.usd) / bcv.usd) * 10000) / 100 : 0,
+                bcvVsParalelo: bcv.usd > 0 ? Math.round(((paraleloRate - bcv.usd) / bcv.usd) * 10000) / 100 : 0,
                 binanceSellVsBuy: binanceBuy > 0 ? Math.round(((binanceSell - binanceBuy) / binanceBuy) * 10000) / 100 : 0,
             },
             timestamp: new Date().toISOString(),
         };
     }
 }
+

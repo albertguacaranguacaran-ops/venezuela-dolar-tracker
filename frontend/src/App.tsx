@@ -82,8 +82,8 @@ function App() {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto">
-        {/* Rate Cards - Now with 5 cards including EUR */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
+        {/* Rate Cards - 6 cards including Paralelo */}
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
           <RateCard
             title="BCV USD"
             rate={rates?.bcv.usd || 0}
@@ -97,6 +97,13 @@ function App() {
             subtitle={`Fecha: ${rates?.bcv.date || '-'}`}
             icon="💶"
             color="purple"
+          />
+          <RateCard
+            title="Paralelo"
+            rate={rates?.paralelo?.rate || 0}
+            subtitle="Compra Físico"
+            icon="💵"
+            color="cyan"
           />
           <RateCard
             title="Binance Compra"
@@ -117,8 +124,41 @@ function App() {
             rate={rates?.binance.avgBuy || 0}
             subtitle="Top 10 ofertas"
             icon="📊"
-            color="cyan"
+            color="green"
           />
+        </div>
+
+        {/* Spread Statistics */}
+        <div className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 border border-slate-700/50 rounded-2xl p-4 mb-8">
+          <h3 className="text-lg font-bold text-white mb-3 flex items-center gap-2">
+            📈 Brecha Cambiaria (Spread)
+          </h3>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="text-center p-3 bg-slate-700/30 rounded-xl">
+              <p className="text-gray-400 text-xs mb-1">BCV vs Binance Compra</p>
+              <p className={`text-xl font-bold ${(rates?.spread?.bcvVsBinanceBuy ?? 0) >= 0 ? 'text-red-400' : 'text-green-400'}`}>
+                {(rates?.spread?.bcvVsBinanceBuy ?? 0) >= 0 ? '+' : ''}{rates?.spread?.bcvVsBinanceBuy ?? 0}%
+              </p>
+            </div>
+            <div className="text-center p-3 bg-slate-700/30 rounded-xl">
+              <p className="text-gray-400 text-xs mb-1">BCV vs Binance Venta</p>
+              <p className={`text-xl font-bold ${(rates?.spread?.bcvVsBinanceSell ?? 0) >= 0 ? 'text-red-400' : 'text-green-400'}`}>
+                {(rates?.spread?.bcvVsBinanceSell ?? 0) >= 0 ? '+' : ''}{rates?.spread?.bcvVsBinanceSell ?? 0}%
+              </p>
+            </div>
+            <div className="text-center p-3 bg-slate-700/30 rounded-xl">
+              <p className="text-gray-400 text-xs mb-1">BCV vs Paralelo</p>
+              <p className={`text-xl font-bold ${(rates?.spread?.bcvVsParalelo ?? 0) >= 0 ? 'text-red-400' : 'text-green-400'}`}>
+                {(rates?.spread?.bcvVsParalelo ?? 0) >= 0 ? '+' : ''}{rates?.spread?.bcvVsParalelo ?? 0}%
+              </p>
+            </div>
+            <div className="text-center p-3 bg-slate-700/30 rounded-xl">
+              <p className="text-gray-400 text-xs mb-1">Binance Venta vs Compra</p>
+              <p className={`text-xl font-bold ${(rates?.spread?.binanceSellVsBuy ?? 0) >= 0 ? 'text-amber-400' : 'text-green-400'}`}>
+                {(rates?.spread?.binanceSellVsBuy ?? 0) >= 0 ? '+' : ''}{rates?.spread?.binanceSellVsBuy ?? 0}%
+              </p>
+            </div>
+          </div>
         </div>
 
         {/* History Chart */}
@@ -132,6 +172,7 @@ function App() {
             bcvRate={rates?.bcv.usd || 0}
             binanceBuy={rates?.binance.buy || 0}
             binanceSell={rates?.binance.sell || 0}
+            paraleloRate={rates?.paralelo?.rate || 0}
           />
           <StatsCard
             bcvRate={rates?.bcv.usd || 0}

@@ -15,7 +15,7 @@ export interface HistoryEntry {
 export class HistoryService implements OnModuleInit {
     private history: HistoryEntry[] = [];
     private readonly historyFile = path.join(process.cwd(), 'rates-history.json');
-    private readonly maxEntries = 168; // 7 days * 24 hours = 168 entries (hourly)
+    private readonly maxEntries = 336; // 7 days * 48 half-hours = 336 entries
 
     constructor(private readonly ratesService: RatesService) { }
 

@@ -30,7 +30,8 @@ export const HistoryChart: React.FC<HistoryChartProps> = ({ apiUrl }) => {
     useEffect(() => {
         const fetchHistory = async () => {
             try {
-                const response = await fetch(`${apiUrl}/rates/history?limit=48`);
+                // 336 entries = 7 days * 48 half-hour intervals
+                const response = await fetch(`${apiUrl}/rates/history?limit=336`);
                 const data = await response.json();
                 setHistory(data);
             } catch (error) {
@@ -77,7 +78,7 @@ export const HistoryChart: React.FC<HistoryChartProps> = ({ apiUrl }) => {
         return (
             <div className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 border border-slate-700/50 rounded-2xl p-6 backdrop-blur-sm">
                 <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-                    📈 Historial de Tasas
+                    📈 Historial Semanal
                 </h3>
                 <div className="flex items-center justify-center h-48 text-gray-400">
                     <p>Aún no hay datos históricos. Los datos se guardan cada 30 minutos.</p>
@@ -90,14 +91,14 @@ export const HistoryChart: React.FC<HistoryChartProps> = ({ apiUrl }) => {
         <div className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 border border-slate-700/50 rounded-2xl p-6 backdrop-blur-sm">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
                 <h3 className="text-xl font-bold text-white flex items-center gap-2">
-                    📈 Historial de Tasas (Últimas 24h)
+                    📈 Historial Semanal (7 días)
                 </h3>
                 <div className="flex gap-2">
                     <button
                         onClick={() => setView('all')}
                         className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${view === 'all'
-                                ? 'bg-purple-500 text-white'
-                                : 'bg-slate-700/50 text-gray-300 hover:bg-slate-600/50'
+                            ? 'bg-purple-500 text-white'
+                            : 'bg-slate-700/50 text-gray-300 hover:bg-slate-600/50'
                             }`}
                     >
                         Todas
@@ -105,8 +106,8 @@ export const HistoryChart: React.FC<HistoryChartProps> = ({ apiUrl }) => {
                     <button
                         onClick={() => setView('bcv')}
                         className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${view === 'bcv'
-                                ? 'bg-blue-500 text-white'
-                                : 'bg-slate-700/50 text-gray-300 hover:bg-slate-600/50'
+                            ? 'bg-blue-500 text-white'
+                            : 'bg-slate-700/50 text-gray-300 hover:bg-slate-600/50'
                             }`}
                     >
                         BCV
@@ -114,8 +115,8 @@ export const HistoryChart: React.FC<HistoryChartProps> = ({ apiUrl }) => {
                     <button
                         onClick={() => setView('binance')}
                         className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${view === 'binance'
-                                ? 'bg-emerald-500 text-white'
-                                : 'bg-slate-700/50 text-gray-300 hover:bg-slate-600/50'
+                            ? 'bg-emerald-500 text-white'
+                            : 'bg-slate-700/50 text-gray-300 hover:bg-slate-600/50'
                             }`}
                     >
                         Binance

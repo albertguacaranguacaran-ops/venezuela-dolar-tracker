@@ -14,8 +14,14 @@ export interface RatesResponse {
         avgBuy: number;
         avgSell: number;
     };
+    paralelo: {
+        rate: number;
+        formula: string;
+    };
     spread: {
         bcvVsBinanceBuy: number;
+        bcvVsBinanceSell: number;
+        bcvVsParalelo: number;
         binanceSellVsBuy: number;
     };
     timestamp: string;
