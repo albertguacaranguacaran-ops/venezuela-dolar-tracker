@@ -5,7 +5,10 @@ import { RateCard } from './components/RateCard';
 import { Calculator } from './components/Calculator';
 import { StatsCard } from './components/StatsCard';
 import { AdBanner } from './components/AdBanner';
+import { HistoryChart } from './components/HistoryChart';
 import './index.css';
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
 function App() {
   const [rates, setRates] = useState<RatesResponse | null>(null);
@@ -54,7 +57,7 @@ function App() {
               Venezuela Dolar Tracker
             </h1>
             <p className="text-gray-400 mt-1">
-              Tasas del dólar en tiempo real • BCV & Binance P2P
+              Tasas del dólar y euro en tiempo real • BCV & Binance P2P
             </p>
           </div>
           <div className="flex items-center gap-4 text-sm text-gray-400">
@@ -79,14 +82,21 @@ function App() {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto">
-        {/* Rate Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        {/* Rate Cards - Now with 5 cards including EUR */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
           <RateCard
-            title="BCV Oficial"
+            title="BCV USD"
             rate={rates?.bcv.usd || 0}
             subtitle={`Fecha: ${rates?.bcv.date || '-'}`}
             icon="🏛️"
             color="blue"
+          />
+          <RateCard
+            title="BCV EUR"
+            rate={rates?.bcv.eur || 0}
+            subtitle={`Fecha: ${rates?.bcv.date || '-'}`}
+            icon="💶"
+            color="purple"
           />
           <RateCard
             title="Binance Compra"
@@ -107,8 +117,13 @@ function App() {
             rate={rates?.binance.avgBuy || 0}
             subtitle="Top 10 ofertas"
             icon="📊"
-            color="purple"
+            color="cyan"
           />
+        </div>
+
+        {/* History Chart */}
+        <div className="mb-8">
+          <HistoryChart apiUrl={API_URL} />
         </div>
 
         {/* Calculator and Stats */}
@@ -154,7 +169,8 @@ function App() {
       {/* Footer */}
       <footer className="max-w-7xl mx-auto mt-8 text-center text-gray-500 text-sm">
         <p>
-          Datos de <a href="https://pydolarve.org" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline">PyDolarVe</a> y Binance P2P
+          Datos de <a href="https://ve.dolarapi.com" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline">DolarAPI</a>,
+          {' '}<a href="https://exchangerate-api.com" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline">ExchangeRate-API</a> y Binance P2P
         </p>
         <p className="mt-1">
           © {new Date().getFullYear()} Venezuela Dolar Tracker • Para uso informativo
@@ -165,3 +181,4 @@ function App() {
 }
 
 export default App;
+

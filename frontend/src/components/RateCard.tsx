@@ -6,7 +6,7 @@ interface RateCardProps {
     subtitle?: string;
     icon: React.ReactNode;
     trend?: 'up' | 'down' | 'neutral';
-    color: 'blue' | 'green' | 'purple' | 'orange';
+    color: 'blue' | 'green' | 'purple' | 'orange' | 'cyan';
 }
 
 export const RateCard: React.FC<RateCardProps> = ({ title, rate, subtitle, icon, color }) => {
@@ -15,6 +15,7 @@ export const RateCard: React.FC<RateCardProps> = ({ title, rate, subtitle, icon,
         green: 'from-emerald-500/20 to-emerald-600/10 border-emerald-500/30',
         purple: 'from-purple-500/20 to-purple-600/10 border-purple-500/30',
         orange: 'from-orange-500/20 to-orange-600/10 border-orange-500/30',
+        cyan: 'from-cyan-500/20 to-cyan-600/10 border-cyan-500/30',
     };
 
     const iconColorClasses = {
@@ -22,6 +23,7 @@ export const RateCard: React.FC<RateCardProps> = ({ title, rate, subtitle, icon,
         green: 'text-emerald-400',
         purple: 'text-purple-400',
         orange: 'text-orange-400',
+        cyan: 'text-cyan-400',
     };
 
     return (
