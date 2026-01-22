@@ -60,8 +60,7 @@ export const Calculator: React.FC<CalculatorProps> = ({ bcvRate, binanceBuy, bin
                 </div>
                 <div className="flex justify-between items-center p-3 bg-cyan-500/10 rounded-xl border border-cyan-500/20">
                     <div>
-                        <span className="text-gray-300">Paralelo</span>
-                        <span className="text-gray-500 text-xs ml-2">(Compra Físico)</span>
+                        <span className="text-gray-300">Compra Físico</span>
                     </div>
                     <span className="text-xl font-bold text-cyan-400">
                         {currency === 'USD' ? `Bs. ${results.paralelo.toFixed(2)}` : `$ ${results.paralelo.toFixed(2)}`}

@@ -99,9 +99,9 @@ function App() {
             color="purple"
           />
           <RateCard
-            title="Paralelo"
+            title="Compra Físico"
             rate={rates?.paralelo?.rate || 0}
-            subtitle="Compra Físico"
+            subtitle="(EUR + Promedio Binance) / 2"
             icon="💵"
             color="cyan"
           />
@@ -147,7 +147,7 @@ function App() {
               </p>
             </div>
             <div className="text-center p-3 bg-slate-700/30 rounded-xl">
-              <p className="text-gray-400 text-xs mb-1">BCV vs Paralelo</p>
+              <p className="text-gray-400 text-xs mb-1">BCV vs Compra Físico</p>
               <p className={`text-xl font-bold ${(rates?.spread?.bcvVsParalelo ?? 0) >= 0 ? 'text-red-400' : 'text-green-400'}`}>
                 {(rates?.spread?.bcvVsParalelo ?? 0) >= 0 ? '+' : ''}{rates?.spread?.bcvVsParalelo ?? 0}%
               </p>
