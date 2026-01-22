@@ -12,17 +12,17 @@ export const AdBanner: React.FC<AdBannerProps> = ({ position }) => {
     };
 
     return (
-        <div className={`${sizeClasses[position]} bg-gradient-to-r from-slate-800/50 to-slate-700/50 rounded-xl border border-slate-600/30 flex items-center justify-center overflow-hidden`}>
-            <div className="text-center">
-                <div className="text-gray-500 text-xs uppercase tracking-wider mb-1">Publicidad</div>
-                <div className="text-gray-400 text-sm">
-                    {/* Google AdSense placeholder - Replace with actual ad code */}
-                    Espacio para tu anuncio
+        <div className={`${sizeClasses[position]} bg-gradient-to-r from-slate-800 to-slate-900 rounded-xl border border-slate-700/50 flex items-center justify-center overflow-hidden relative group cursor-default`}>
+            {/* Background Pattern */}
+            <div className="absolute inset-0 opacity-10 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-blue-400 via-gray-900 to-black"></div>
+
+            <div className="text-center z-10">
+                <div className="flex items-center justify-center gap-2 mb-1">
+                    <span className="text-emerald-400 text-lg">📢</span>
+                    <span className="text-gray-300 font-medium tracking-wide">Espacio Disponible</span>
                 </div>
-                <div className="text-gray-600 text-xs mt-1">
-                    {position === 'top' && '728x90'}
-                    {position === 'bottom' && '970x90'}
-                    {position === 'sidebar' && '300x250'}
+                <div className="text-gray-500 text-xs uppercase tracking-wider">
+                    Tu publicidad aquí
                 </div>
             </div>
         </div>
